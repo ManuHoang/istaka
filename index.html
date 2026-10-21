@@ -580,6 +580,8 @@ function renderEmpty(){
   renderRack(false);
 }
 function renderRack(canDisc){
+  if(DRAG){RACK.dirty=true;return;}
+  RACK.dirty=false;
   const fresh=RACK.fresh;
   for(let r=0;r<2;r++){
     let h='';
@@ -639,30 +641,32 @@ function myDiscard(id,finish){
 
 /* ================= rack interaction (tap + drag) ================= */
 let DRAG=null;
+function killGhosts(){document.querySelectorAll('.tile.ghost').forEach(g=>g.remove());document.querySelectorAll('.dragsrc').forEach(x=>x.classList.remove('dragsrc'));}
+function endDrag(){if(DRAG&&DRAG.ghost)DRAG.ghost.remove();DRAG=null;killGhosts();renderRack(canDiscNow());}
 function rackDown(e){
+  if(DRAG)endDrag();else killGhosts();
   const t=e.target.closest('.tile');if(!t||!t.closest('.rack'))return;
   e.preventDefault();
-  DRAG={id:+t.dataset.id,x:e.clientX,y:e.clientY,el:t,moving:false,ghost:null};
-  try{t.setPointerCapture(e.pointerId);}catch(_){}
+  DRAG={id:+t.dataset.id,x:e.clientX,y:e.clientY,el:t,moving:false,ghost:null,pid:e.pointerId};
 }
 function rackMove(e){
   if(!DRAG)return;
-  if(!DRAG.moving){if(Math.hypot(e.clientX-DRAG.x,e.clientY-DRAG.y)<7)return;DRAG.moving=true;
+  if(!DRAG.moving){if(Math.hypot(e.clientX-DRAG.x,e.clientY-DRAG.y)<7)return;DRAG.moving=true;DRAG.t=Date.now();
     const r=DRAG.el.getBoundingClientRect();const cs=getComputedStyle(DRAG.el);const g=DRAG.el.cloneNode(true);g.classList.add('ghost');g.classList.remove('sel','new');g.style.width=r.width+'px';g.style.height=r.height+'px';g.style.paddingTop=cs.paddingTop;g.style.setProperty('--tf',cs.getPropertyValue('--tf')||'20px');document.body.appendChild(g);DRAG.ghost=g;DRAG.w=r.width;DRAG.h=r.height;DRAG.el.classList.add('dragsrc');}
   DRAG.ghost.style.left=(e.clientX-DRAG.w/2)+'px';DRAG.ghost.style.top=(e.clientY-DRAG.h/2)+'px';
   document.querySelectorAll('.slot.over').forEach(x=>x.classList.remove('over'));
   const el=document.elementFromPoint(e.clientX,e.clientY);const sl=el&&el.closest('.slot');if(sl)sl.classList.add('over');
 }
 function rackUp(e){
-  if(!DRAG)return;const d=DRAG;DRAG=null;
+  if(!DRAG){killGhosts();return;}const d=DRAG;DRAG=null;killGhosts();
   document.querySelectorAll('.slot.over').forEach(x=>x.classList.remove('over'));
   if(d.moving){
-    d.ghost.remove();d.el.classList.remove('dragsrc');
     const el=document.elementFromPoint(e.clientX,e.clientY);
     if(el&&el.closest('#myDisc')){myDiscard(d.id,false);return;}
     const sl=el&&el.closest('.slot');if(sl)moveTo(d.id,+sl.dataset.slot);
     renderRack(canDiscNow());return;
   }
+  if(RACK.dirty)renderRack(canDiscNow());
   // tap
   if(RACK.sel==null)RACK.sel=d.id;
   else if(RACK.sel===d.id)RACK.sel=null;
@@ -678,7 +682,10 @@ function swap(a,b){const i=RACK.slots.indexOf(a),j=RACK.slots.indexOf(b);if(i<0|
 document.addEventListener('pointerdown',rackDown);
 document.addEventListener('pointermove',rackMove);
 document.addEventListener('pointerup',rackUp);
-document.addEventListener('pointercancel',()=>{if(DRAG){if(DRAG.ghost)DRAG.ghost.remove();DRAG.el.classList.remove('dragsrc');DRAG=null;}});
+document.addEventListener('pointercancel',()=>{if(DRAG)endDrag();});
+window.addEventListener('blur',()=>{if(DRAG)endDrag();});
+document.addEventListener('visibilitychange',()=>{if(DRAG)endDrag();});
+setInterval(()=>{if(!DRAG&&document.querySelector('.tile.ghost'))killGhosts();if(DRAG&&DRAG.moving&&Date.now()-(DRAG.t||Date.now())>8000)endDrag();},1000);
 $('#rack0').parentElement.addEventListener('click',e=>{
   const sl=e.target.closest('.slot');if(!sl||sl.querySelector('.tile'))return;
   if(RACK.sel!=null){moveTo(RACK.sel,+sl.dataset.slot);RACK.sel=null;renderRack(canDiscNow());}
