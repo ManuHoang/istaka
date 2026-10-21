@@ -1,0 +1,75 @@
+/* Back Room shared styles: card-room at night. Wood rails, green felt, ivory tiles/cards, brass accent. */
+:root{
+  color-scheme:dark;
+  --bg:#0f0d0b;--panel:#1a1714;--panel2:#24201b;--line:#3a332b;--text:#f1ebe2;--muted:#a3978a;
+  --felt:#1c5a52;--felt-hi:#24736a;--felt-lo:#0f3631;
+  --wood:#7a4a24;--wood-hi:#9a6234;--wood-lo:#4f2e14;
+  --ivory:#fffcf2;--ivory-lo:#e8dcc0;--ivory-edge:#bfae86;
+  --red:#d3262c;--yel:#d68f00;--blu:#1d5fd6;--blk:#1d1b1a;
+  --accent:#f0b343;--accent-ink:#1a1205;--ok:#4bbf6b;--bad:#e5594f;
+  --pblue:#2f6fd6;--bred:#c8333a;
+  --display:"Saira Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:14px}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}.sp{flex:1}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:800;letter-spacing:1.5px;line-height:1}
+.brand span{color:var(--accent)}
+.small{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.small.acc{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.small.on{border-color:var(--accent);color:var(--accent)}
+.btn{border:0;border-radius:10px;padding:12px 16px;font-family:var(--display);font-weight:700;font-size:16px;color:#fff;cursor:pointer;letter-spacing:.3px;touch-action:manipulation}
+.btn.gold{background:#b07a1c}.btn.green{background:#2f7a43}.btn.red{background:#7a2a2f}.btn.blue{background:#1f5180}.btn.dark{background:var(--panel2);border:1px solid var(--line)}
+button:disabled{opacity:.35;cursor:default}
+input.txt{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit;font-size:16px}
+input.codein{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-family:var(--display);font-size:26px;font-weight:800;letter-spacing:8px;text-transform:uppercase}
+.bigcode{font-family:var(--display);font-weight:800;color:var(--accent);line-height:1;letter-spacing:.4em}
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);padding:9px 14px;border-radius:10px;font-weight:700;z-index:99;max-width:calc(100% - 32px);text-align:center}
+@keyframes pulse{50%{box-shadow:0 0 0 4px rgba(240,179,67,.25)}}
+
+/* playing cards */
+.pc{width:var(--cw,44px);height:calc(var(--cw,44px)*1.4);border-radius:calc(var(--cw,44px)*.11);background:var(--ivory);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;font-family:var(--display);font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,.45);user-select:none;-webkit-user-select:none;flex:none}
+.pc .r{font-size:calc(var(--cw,44px)*.5)}
+.pc .s{font-size:calc(var(--cw,44px)*.42);margin-top:2px;font-family:var(--body)}
+.pc.s-s{color:#1b1f24}.pc.s-h{color:#d1242f}.pc.s-d{color:#1f6feb}.pc.s-c{color:#1a7f37}
+.pc.back{background:repeating-linear-gradient(45deg,#c98a1f 0 4px,#8f5b10 4px 8px);border:2px solid var(--ivory)}
+.pc.ghost{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 2px rgba(255,255,255,.15)}
+
+/* TV side panel */
+.tvp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.4vh 12px;display:grid;gap:1vh;justify-items:center;text-align:center;align-content:start;min-height:0;overflow:hidden}
+.tvp .qr{width:clamp(110px,22vh,230px);height:clamp(110px,22vh,230px);background:#fff;border-radius:12px;padding:clamp(5px,1vh,10px);display:flex;align-items:center;justify-content:center;color:#555;font-size:13px}
+.tvp .qr img{width:100%;height:100%;image-rendering:pixelated}
+.tvp .bigcode{font-size:clamp(22px,4vh,38px)}
+.tvp .url{font-size:clamp(9px,1.2vh,13px);color:var(--muted);word-break:break-all}
+.tvp .lbl{font-size:clamp(10px,1.4vh,13px);color:var(--muted)}
+.tvp .who{display:grid;gap:.5vh;width:100%}
+.tvp .who div{display:flex;justify-content:space-between;gap:8px;background:var(--panel2);border-radius:8px;padding:.6vh 10px;font-weight:700;font-size:clamp(11px,1.6vh,15px)}
+.tvp .who .ph{color:var(--accent)}
+.tvp .tools{display:flex;gap:6px;width:100%}.tvp .tools>*{flex:1}
+.tvp .btn{width:100%;padding:1.2vh 10px;font-size:clamp(13px,1.9vh,17px)}
+.tvp select{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px;font:inherit;font-size:13px}
+
+/* TV page frame */
+body.tv{overflow:hidden}
+.tvframe{height:100vh;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) clamp(210px,21vw,340px);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"head head" "main panel" "main side";gap:1.2vh 1.2vw;padding:1.2vh 1.2vw;overflow:hidden}
+.tvframe>header{grid-area:head;display:flex;align-items:center;gap:12px}
+.tvframe>header .brand{font-size:clamp(22px,3.6vh,40px)}
+.tvframe>.main{grid-area:main;min-height:0}
+.tvframe>.tvp{grid-area:panel}
+.tvframe>.side{grid-area:side;min-height:0;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font:clamp(11px,1.4vh,14px)/1.5 var(--mono)}
+.side .hd{color:var(--accent)}
+
+/* join / chooser screens */
+.screen{position:fixed;inset:0;z-index:70;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));overflow:auto}
+.jcard{display:grid;gap:10px;width:min(380px,100%);text-align:left}
+.jcard .brand{font-size:34px;margin-bottom:4px}
+.jcard input{width:100%}
+.jcard .btn{width:100%;font-size:19px;padding:14px}
+.jcard a{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
