@@ -116,22 +116,34 @@ textarea.code{width:100%;height:70px;background:var(--bg);color:var(--text);bord
 .set{display:flex;gap:3px;background:rgba(0,0,0,.25);padding:5px;border-radius:8px}
 .set .mini{width:30px}.set .tile{--tf:15px}
 .toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);padding:8px 14px;border-radius:10px;font-weight:700;z-index:90;max-width:calc(100% - 32px)}
-/* ---------- TV mode ---------- */
+/* ---------- TV mode: everything sized to the screen height so it always fits ---------- */
 #tvPanel{display:none}
-body.tv .wrap{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) 340px;grid-template-areas:"head head" "board panel" "board log";grid-template-rows:auto auto minmax(0,1fr);gap:14px;padding-block:14px;min-height:100vh}
+body.tv{overflow:hidden;padding:0}
+body.tv .wrap{max-width:none;height:100vh;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) clamp(210px,21vw,340px);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"head head" "board panel" "board log";gap:1.2vh 1.2vw;padding:1.2vh 1.2vw;overflow:hidden}
 body.tv header{grid-area:head}
-body.tv #board{grid-area:board;min-height:calc(100vh - 120px);grid-template-columns:minmax(150px,1fr) minmax(0,2fr) minmax(150px,1fr);grid-template-rows:auto minmax(0,1fr) auto;border-width:14px;padding:16px;gap:14px}
+body.tv .brand{font-size:clamp(22px,3.6vh,40px)}body.tv .brand small{display:none}
+body.tv .sc{font-size:clamp(12px,1.7vh,16px);padding:.4vh 10px}body.tv .sc b{font-size:clamp(15px,2.3vh,22px)}
+body.tv #board{grid-area:board;height:100%;min-height:0;overflow:hidden;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;border-width:clamp(8px,1.3vh,14px);padding:1.4vh;gap:1.2vh}
 body.tv #tvPanel{grid-area:panel;display:grid}
-body.tv #log{grid-area:log;margin-top:0;max-height:none;min-height:120px;font-size:14px;overflow:auto}
+body.tv #log{grid-area:log;margin-top:0;max-height:none;min-height:0;font-size:clamp(11px,1.4vh,14px);overflow:auto}
 body.tv .settings,body.tv #online,body.tv .rackwrap,body.tv .actions,body.tv .foot{display:none}
-body.tv .mini{width:66px}body.tv .mini .tile{--tf:32px}
-body.tv .stack{width:74px;height:100px;font-size:30px}
-body.tv .plate{padding:8px 16px;min-width:160px}body.tv .plate .nm{font-size:21px;max-width:240px}body.tv .plate .meta{font-size:15px}
-body.tv .tagh{font-size:11px}
-body.tv .status{font-size:26px}
-body.tv .disc{min-height:140px}body.tv .disc .lbl,body.tv .pile .lbl{font-size:14px}body.tv .disc .cnt{font-size:13px;padding:1px 7px}
-body.tv .backs i{width:18px;height:26px;margin-left:-8px}
-body.tv .brand{font-size:40px}body.tv .sc{font-size:16px;padding:6px 12px}body.tv .sc b{font-size:22px}
+body.tv .mini{width:clamp(34px,6.2vh,70px)}body.tv .mini .tile{--tf:clamp(16px,3vh,33px)}
+body.tv .stack{width:clamp(38px,7vh,78px);height:clamp(52px,9.5vh,106px);font-size:clamp(16px,3vh,32px)}
+body.tv .plate{padding:.6vh 1.2vw;min-width:0}body.tv .plate .nm{font-size:clamp(14px,2.2vh,23px);max-width:20vw}body.tv .plate .meta{font-size:clamp(11px,1.5vh,16px)}
+body.tv .tagh{font-size:clamp(8px,1.1vh,11px)}
+body.tv .status{font-size:clamp(15px,2.5vh,28px);gap:.6vh;min-height:0}
+body.tv .disc{min-height:clamp(64px,13vh,150px);padding:.5vh}body.tv .disc .lbl,body.tv .pile .lbl{font-size:clamp(10px,1.4vh,14px)}body.tv .disc .cnt{font-size:clamp(10px,1.3vh,13px);padding:1px 7px}
+body.tv .backs i{width:clamp(10px,1.7vh,18px);height:clamp(14px,2.4vh,26px);margin-left:calc(clamp(10px,1.7vh,18px)*-.45)}
+body.tv .seat{gap:.6vh}
+body.tv .mid{gap:2vw}
+body.tv .tvp{padding:1.4vh 12px;gap:1vh}
+body.tv .tvp .qr{width:clamp(110px,23vh,230px);height:clamp(110px,23vh,230px);padding:clamp(5px,1vh,10px)}
+body.tv .tvp .bigcode{font-size:clamp(22px,4vh,38px);letter-spacing:.4em}
+body.tv .tvp .who{gap:.5vh}body.tv .tvp .who div{padding:.6vh 10px;font-size:clamp(11px,1.6vh,15px)}
+body.tv .tvp .btn{padding:1.2vh 10px;font-size:clamp(13px,1.9vh,17px)}
+body.tv .tvp .muted{font-size:clamp(10px,1.4vh,13px)}
+body.tv .tvp .url{font-size:clamp(9px,1.2vh,13px)}
+.tvtools{display:flex;gap:6px;width:100%}.tvtools .small{flex:1}
 .tvp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;gap:12px;justify-items:center;text-align:center;align-content:start}
 .tvp .qr{width:230px;height:230px;background:#fff;border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center;color:#555;font-size:13px}
 .tvp .qr img{width:100%;height:100%;image-rendering:pixelated}
@@ -1116,7 +1128,9 @@ function renderTV(){
   const idle=S.phase==='idle'||S.phase==='over';
   const who=S.players.map((p,i)=>`<div><span>${esc(p.name)}</span><span class="${p.ctrl==='remote'?'ph':'muted'}">${p.ctrl==='remote'?'phone':'bot'}</span></div>`).join('');
   const qrInner=QR.url===url&&QR.src?`<img alt="QR code to join the table" src="${QR.src}">`:(url?'Loading QR…':'Opening the table…');
-  $('#tvPanel').innerHTML=`<div class="muted" style="font-weight:700">Scan with your phone camera to join</div>
+  const fs=!!(document.fullscreenElement||document.webkitFullscreenElement);
+  $('#tvPanel').innerHTML=`<div class="tvtools"><button class="small${fs?' on':''}" id="tvFS">${fs?'Exit full screen':'Full screen'}</button></div>
+    <div class="muted" style="font-weight:700">Scan with your phone camera to join</div>
     <div class="qr" id="qrBox">${qrInner}</div>
     <div class="muted">or open the link and type</div>
     <div class="bigcode">${esc(NET.sCode||'·····')}</div>
@@ -1126,7 +1140,17 @@ function renderTV(){
     ${S.phase==='over'?'<div class="muted">Next round starts automatically.</div>':''}`;
   if(url&&!(QR.url===url&&QR.src))drawQR(url);
 }
-$('#tvPanel').addEventListener('click',e=>{if(e.target.id==='tvDeal'){$('#resModal').hidden=true;startRound();}});
+$('#tvPanel').addEventListener('click',e=>{if(e.target.id==='tvDeal'){$('#resModal').hidden=true;startRound();}else if(e.target.id==='tvFS')toggleFS();});
+function toggleFS(){
+  const d=document,el=d.documentElement;
+  try{
+    if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);}
+    else{const r=(el.requestFullscreen||el.webkitRequestFullscreen);if(!r){toast('Press F11 for full screen.');return;}const p=r.call(el);if(p&&p.catch)p.catch(()=>toast('Press F11 for full screen.'));}
+  }catch(e){toast('Press F11 for full screen.');}
+}
+document.addEventListener('fullscreenchange',()=>{if(cfg.tv)renderTV();});
+document.addEventListener('webkitfullscreenchange',()=>{if(cfg.tv)renderTV();});
+document.addEventListener('keydown',e=>{if(cfg.tv&&(e.key==='f'||e.key==='F')&&!/INPUT|TEXTAREA/.test((e.target||{}).tagName||''))toggleFS();});
 function enterTV(){
   if(cfg.tv||cfg.ctl)return;
   if(S.mode==='client'){toast('Leave the table first.');return;}
