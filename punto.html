@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Back Room Punto Banco</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23b07a1c'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23fffcf2' stroke-width='5' stroke-dasharray='8 6'/%3E%3Ccircle cx='32' cy='32' r='12' fill='%231c5a52'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#0f0d0b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Saira+Semi+Condensed:wght@600;700;800&display=swap">
@@ -24,7 +25,25 @@
 .hand h2{margin:0;font-family:var(--display);font-size:clamp(20px,4vh,44px);letter-spacing:.12em}
 .hand.p h2{color:#8fb5ff}.hand.b h2{color:#ff9a9f}
 .cards{display:flex;gap:1vw;--cw:clamp(44px,10vh,104px);min-height:calc(var(--cw)*1.4);align-items:center}
-.cards .third{transform:rotate(90deg);margin:0 calc(var(--cw)*.2)}
+.thirdw{transform:rotate(90deg);margin:0 calc(var(--cw)*.22)}
+/* dealt cards: slide in from the shoe face down, then flip */
+.dc{width:var(--cw);height:calc(var(--cw)*1.4);perspective:900px;flex:none}
+.dci{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+.dci>.pc{position:absolute;inset:0;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.dci>.pc.back{transform:rotateY(180deg)}
+.dc.deal{animation:dealIn 700ms cubic-bezier(.16,.84,.28,1) both;animation-delay:calc(var(--t)*-1ms)}
+.dc.deal .dci{animation:flipUp 550ms cubic-bezier(.3,.6,.25,1) both;animation-delay:calc(700ms - var(--t)*1ms)}
+@keyframes dealIn{0%{transform:translate(42vw,-46vh) rotate(-30deg) scale(.75);opacity:0}15%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes flipUp{0%{transform:rotateY(180deg)}100%{transform:rotateY(0)}}
+.pop{animation:pop 480ms cubic-bezier(.2,1.6,.4,1) both;animation-delay:calc(var(--t)*-1ms);display:inline-block}
+@keyframes pop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+.resin{animation:resIn 650ms cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--t)*-1ms);display:inline-block}
+@keyframes resIn{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+.hand{transition:background .6s}
+.hand.won{animation:glowIn 900ms ease-out both;animation-delay:calc(var(--t)*-1ms)}
+@keyframes glowIn{0%{box-shadow:0 0 0 0 rgba(240,179,67,0);border-color:rgba(255,255,255,.12)}100%{box-shadow:0 0 0 3px var(--accent),0 0 28px rgba(240,179,67,.45);border-color:var(--accent)}}
+.area.hit{animation:hitIn 900ms ease-out both;animation-delay:calc(var(--t)*-1ms)}
+@keyframes hitIn{0%{background:transparent}40%{background:rgba(240,179,67,.38)}100%{background:rgba(240,179,67,.18)}}
 .total{font-family:var(--display);font-size:clamp(28px,7vh,76px);font-weight:800;line-height:1;min-height:1em}
 .result{font-family:var(--display);font-weight:800;font-size:clamp(18px,3.6vh,38px);text-align:center;min-height:1.2em;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 .areas{display:grid;grid-template-columns:1fr .8fr 1fr .7fr .7fr;gap:1vw}
@@ -105,6 +124,24 @@ const QS=new URLSearchParams(location.search);
 const PAY={P:1,B:1,T:10,PP:12,BP:12};
 const AREAS=[['P','Player'],['T','Tie'],['B','Banker'],['PP','P Pair'],['BP','B Pair']];
 const START=1000,BET_MS=20000,RESULT_MS=6500,CHIPS=[5,25,100,500];
+const DEAL_MS=1250;
+let SEEN={},SEENR=null,reT=null;
+function since(round,key){if(SEENR!==round){SEEN={};SEENR=round;}const now=Date.now();if(SEEN[key]==null)SEEN[key]=now;return now-SEEN[key];}
+function dealt(a,round,side,again){
+  // returns html for a hand plus how many cards have finished flipping
+  let html='',done=[],wait=0;
+  a.forEach((c,i)=>{
+    const t=since(round,side+i),fresh=t<DEAL_MS;
+    if(fresh)wait=Math.max(wait,DEAL_MS-t);else done.push(c);
+    const card=`<div class="dc${fresh?' deal':''}" style="--t:${t}"><div class="dci">${cardHTML(c)}<div class="pc back"></div></div></div>`;
+    html+=i===2?`<div class="thirdw">${card}</div>`:card;
+  });
+  if(a.length<2)for(let i=a.length;i<2;i++)html+=cardHTML(null);
+  if(wait&&again){clearTimeout(reT);reT=setTimeout(again,wait+40);}
+  const tt=done.length?tot(done):'';
+  const pt=done.length?since(round,side+'t'+done.length):0;
+  return {html,total:done.length?`<span class="${pt<600?'pop':''}" style="--t:${pt}">${tt}</span>`:''};
+}
 const RANKS='23456789TJQKA',SUITS='shdc',SYM={s:'♠',h:'♥',d:'♦',c:'♣'};
 const money=n=>{n=Math.round(n*100)/100;return Number.isInteger(n)?n.toLocaleString('en-US'):n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});};
 const odds=k=>PAY[k]+' : 1';
@@ -156,13 +193,14 @@ function deal(){
       if(bd){b3=draw();bc.push(b3);}
     } else if(bt<=5){b3=draw();bc.push(b3);}
   }
-  steps.push(()=>{H.p=[p1];},()=>{H.b=[b1];},()=>{H.p=[p1,p2];},()=>{H.b=[b1,b2];});
-  if(p3!=null)steps.push(()=>{H.p=pc.slice();});
-  if(b3!=null)steps.push(()=>{H.b=bc.slice();});
-  steps.push(()=>settle(pc,bc));
+  // [wait before this step, action]: slow, casino-paced reveal
+  steps.push([900,()=>{H.p=[p1];}],[1400,()=>{H.b=[b1];}],[1400,()=>{H.p=[p1,p2];}],[1400,()=>{H.b=[b1,b2];}]);
+  if(p3!=null)steps.push([2000,()=>{H.p=pc.slice();}]);
+  if(b3!=null)steps.push([p3!=null?1700:2000,()=>{H.b=bc.slice();}]);
+  steps.push([1700,()=>settle(pc,bc)]);
   let i=0;
-  const next=()=>{steps[i++]();publish();if(i<steps.length)H.timer=setTimeout(next,i===4?1100:800);};
-  H.timer=setTimeout(next,500);
+  const next=()=>{steps[i++][1]();publish();if(i<steps.length)H.timer=setTimeout(next,steps[i][0]);};
+  H.timer=setTimeout(next,steps[0][0]);
 }
 function settle(pc,bc){
   const pt=tot(pc),bt=tot(bc);
@@ -233,19 +271,19 @@ function renderTV(){
   if(v.ph==='wait')phase=H.paused?'Paused':H.net?'Waiting for players':'Opening the table…';
   else if(v.ph==='bet')phase='Place your bets';
   else if(v.ph==='deal')phase='No more bets';
-  else if(v.ph==='result')phase=res.w==='P'?'Player wins':res.w==='B'?'Banker wins':'Tie';
-  const pT=v.p.length?tot(v.p):'',bT=v.b.length?tot(v.b):'';
-  const cards=a=>[0,1,2].map(i=>a[i]!=null?cardHTML(a[i],i===2?'third':''):(i<2?cardHTML(null):'')).join('');
+  else if(v.ph==='result'){const t=since(v.round,'res');phase=`<span class="${t<700?'resin':''}" style="--t:${t}">${res.w==='P'?'Player wins':res.w==='B'?'Banker wins':'Tie'}</span>`;}
+  const PH=dealt(v.p,v.round,'p',renderTV),BH=dealt(v.b,v.round,'b',renderTV);
+  const rt=v.ph==='result'?since(v.round,'res'):0;
   const byArea=k=>[...H.players.values()].filter(p=>p.bets[k]>0).map(p=>`${esc(p.name)} ${money(p.bets[k])}`).join('<br>');
   const hit=k=>res&&v.ph==='result'&&((k==='P'&&res.w==='P')||(k==='B'&&res.w==='B')||(k==='T'&&res.w==='T')||(k==='PP'&&res.pp)||(k==='BP'&&res.bp));
   const counts={P:0,B:0,T:0};H.road.forEach(r=>counts[r]++);
   $('#btable').innerHTML=`
     <div class="bhead"><span class="phase">${phase}${v.ph==='bet'?` · <span id="cd">${Math.ceil(v.dl/1000)}s</span>`:''}</span><div class="timer"><i data-dl="${v.ph==='bet'||v.ph==='result'?Date.now()+v.dl:0}" data-tot="${v.ph==='bet'?BET_MS:RESULT_MS}"></i></div><span class="shoe">Shoe: ${v.shoe} cards</span></div>
     <div class="hands">
-      <div class="hand p${res&&v.ph==='result'&&res.w==='P'?' won':''}"><h2>PLAYER</h2><div class="cards">${cards(v.p)}</div><div class="total">${pT}</div></div>
-      <div class="hand b${res&&v.ph==='result'&&res.w==='B'?' won':''}"><h2>BANKER</h2><div class="cards">${cards(v.b)}</div><div class="total">${bT}</div></div>
+      <div class="hand p${res&&v.ph==='result'&&res.w==='P'?' won':''}" style="--t:${rt}"><h2>PLAYER</h2><div class="cards">${PH.html}</div><div class="total">${PH.total}</div></div>
+      <div class="hand b${res&&v.ph==='result'&&res.w==='B'?' won':''}" style="--t:${rt}"><h2>BANKER</h2><div class="cards">${BH.html}</div><div class="total">${BH.total}</div></div>
     </div>
-    <div class="areas">${AREAS.map(([k,l])=>`<div class="area ${k}${hit(k)?' hit':''}"><b>${l.toUpperCase()}</b><span class="odds">pays ${odds(k)}</span><span class="amt">${v.tot[k]?money(v.tot[k]):''}</span><span class="who">${byArea(k)}</span></div>`).join('')}</div>
+    <div class="areas">${AREAS.map(([k,l])=>`<div class="area ${k}${hit(k)?' hit':''}" style="--t:${rt}"><b>${l.toUpperCase()}</b><span class="odds">pays ${odds(k)}</span><span class="amt">${v.tot[k]?money(v.tot[k]):''}</span><span class="who">${byArea(k)}</span></div>`).join('')}</div>
     <div class="roadwrap"><div class="road">${roadHTML(v.road)}</div><div class="stats"><span style="color:#8fb5ff">P <b>${counts.P}</b></span><span style="color:#ff9a9f">B <b>${counts.B}</b></span><span style="color:#7ad68c">T <b>${counts.T}</b></span></div><span class="sp"></span><div class="result">${v.ph==='result'?`${res.pt} – ${res.bt}${res.nat?' natural':''}${res.pp?' · player pair':''}${res.bp?' · banker pair':''}`:''}</div></div>`;
   const players=[...H.players.values()].map(p=>({name:p.name,kind:p.on?'phone':'away',extra:`${money(p.bal)}${p.ready&&v.ph==='bet'?' ✓':''}`}));
   TABLE.tvPanel($('#panel'),{game:'punto',code:H.code,players,extra:`<button class="btn dark" data-h="pause">${H.paused?'Resume dealing':'Pause after this round'}</button>${v.ph==='bet'?'<button class="btn gold" data-h="deal">Deal now</button>':''}<div class="lbl">No commission. Player and Banker both pay 1:1, so neither side has an edge overall.</div>`});
@@ -321,11 +359,11 @@ function renderPhone(){
   const canBet=v.ph==='bet';
   const avail=Math.round((me.bal-inBets)*100)/100;
   const showCards=v.p.length||v.b.length;
-  const cards=a=>[0,1,2].map(i=>a[i]!=null?cardHTML(a[i]):'').join('')||cardHTML(null)+cardHTML(null);
+  const PH=dealt(v.p,v.round,'p',renderPhone),BH=dealt(v.b,v.round,'b',renderPhone);
   app.innerHTML=`<div class="pctl">
     <div class="top"><span class="nm">${esc(C.name)}</span><span class="bal">${money(canBet?avail:me.bal)}</span><span class="net ${me.net>=0?'pos-n':'neg-n'}">${me.net>=0?'+':''}${money(me.net)}</span><span class="sp"></span><a class="small" href="./">Leave</a></div>
     <div class="stat">${stat}</div><div class="sub">${sub}</div>
-    ${showCards?`<div class="mini"><div class="side2"><b style="color:#8fb5ff">PLAYER ${v.p.length?tot(v.p):''}</b><div class="cards">${cards(v.p)}</div></div><div class="side2"><b style="color:#ff9a9f">BANKER ${v.b.length?tot(v.b):''}</b><div class="cards">${cards(v.b)}</div></div></div>`:''}
+    ${showCards?`<div class="mini"><div class="side2"><b style="color:#8fb5ff">PLAYER ${PH.total}</b><div class="cards">${PH.html}</div></div><div class="side2"><b style="color:#ff9a9f">BANKER ${BH.total}</b><div class="cards">${BH.html}</div></div></div>`:''}
     <div class="chips">${CHIPS.map(c=>`<button class="chipb c${c}${C.chip===c?' on':''}" data-chip="${c}" aria-label="Chip ${c}">${c}</button>`).join('')}</div>
     <div class="zones">${[['P','Player'],['B','Banker'],['T','Tie'],['PP','P Pair'],['BP','B Pair']].map(([k,l])=>`<button class="zone ${k}${k.length===2?' small2':''}" data-z="${k}" ${canBet?'':'disabled'}><b>${l.toUpperCase()}</b><span class="odds">pays ${odds(k)}</span><span class="my">${me.bets[k]?money(me.bets[k]):''}</span></button>`).join('')}</div>
     <div class="btns"><button class="btn dark" data-b="clear" ${canBet&&inBets?'':'disabled'}>Clear</button><button class="btn dark" data-b="rebet" ${canBet&&!inBets?'':'disabled'}>Rebet</button><button class="btn ${me.ready?'dark':'green'}" data-b="ready" ${canBet&&inBets?'':'disabled'}>${me.ready?'Not ready':'Ready'}</button></div>

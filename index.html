@@ -4,103 +4,158 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Back Room</title>
-<meta name="description" content="Game night on the big screen: Okey, Poker and Punto Banco with phones as controllers.">
+<meta name="description" content="Game night on the big screen: Okey, Poker and Punto Banco, with everyone's phone as their hand.">
+<meta property="og:title" content="Back Room">
+<meta property="og:description" content="Game night on the big screen. The TV is the table, phones are the hands.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f0d0b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23b07a1c'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23fffcf2' stroke-width='5' stroke-dasharray='8 6'/%3E%3Ccircle cx='32' cy='32' r='12' fill='%231c5a52'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Saira+Semi+Condensed:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Saira+Semi+Condensed:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="table.css">
 <style>
-/* Layout: one column on phones, join box first; on a TV/laptop the three game cards sit in a row under the masthead. */
-body{min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1d2a26 0%,var(--bg) 55%)}
-.wrap{max-width:1100px;margin:0 auto;padding-block:clamp(18px,5vh,56px) 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:clamp(18px,3.5vh,34px)}
-.mast{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}
-.mast .brand{font-size:clamp(42px,8vw,84px);letter-spacing:3px}
-.mast p{margin:0 0 .6em;color:var(--muted);font-size:clamp(14px,1.8vw,18px);max-width:34ch;line-height:1.45}
-.join{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.join h2{margin:0;font-family:var(--display);font-size:22px;font-weight:700;flex:0 0 auto}
-.join form{display:flex;gap:10px;flex:1;min-width:0;flex-wrap:wrap}
-.join .codein{flex:1;min-width:180px;width:100%}
-.join .btn{flex:0 0 auto;padding:12px 22px;font-size:18px}
-.join .note{flex-basis:100%;font-size:13px;color:var(--muted)}
-.games{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.game{background:radial-gradient(ellipse at 50% 0%,var(--felt-hi),var(--felt) 55%,var(--felt-lo));border:8px solid var(--wood-lo);border-radius:20px;padding:18px;display:grid;gap:12px;align-content:start;box-shadow:0 10px 26px rgba(0,0,0,.5);min-width:0}
-.game h3{margin:0;font-family:var(--display);font-size:30px;letter-spacing:1px;font-weight:800}
-.game .meta{font-size:13px;color:#cfe3dc;font-weight:700;letter-spacing:.3px}
-.game p{margin:0;font-size:14px;line-height:1.5;color:#e2ece8}
-.emblem{height:96px;display:flex;align-items:center;justify-content:center;gap:8px}
-.tile{width:46px;height:62px;border-radius:6px;background:linear-gradient(var(--ivory),var(--ivory-lo));box-shadow:0 2px 0 var(--ivory-edge),0 4px 10px rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;padding-top:8px;font-family:var(--display);font-weight:800;font-size:26px;line-height:1}
+/* Layout: masthead and code bar left-aligned; an asymmetric game grid (poker featured, okey and punto stacked);
+   a single ribbon for "how it works". Card-room at night: warm off-black, felt, wood rails, one brass accent. */
+body{min-height:100dvh;background:radial-gradient(120% 70% at 18% -10%,#1f2b26 0%,rgba(15,13,11,0) 60%),radial-gradient(90% 60% at 100% 0%,#22180f 0%,rgba(15,13,11,0) 55%),var(--bg)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.skip{position:absolute;left:-9999px;top:8px;z-index:5;background:var(--accent);color:var(--accent-ink);padding:8px 12px;border-radius:8px;font-weight:700}
+.skip:focus{left:12px}
+.wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding-block:clamp(22px,6vh,64px) 48px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));display:grid;gap:clamp(22px,4vh,40px)}
+
+/* masthead */
+.mast{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);align-items:end;gap:10px 28px}
+.mast .brand{font-size:clamp(52px,10vw,118px);letter-spacing:-.01em;font-weight:800}
+.mast p{margin:0 0 .9em;color:var(--muted);font-size:clamp(15px,1.7vw,19px);max-width:30ch;line-height:1.45;text-wrap:balance}
+.mast p em{font-style:normal;color:var(--text)}
+
+/* code bar */
+.join{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px 14px;background:linear-gradient(180deg,#1d1915,#16130f);border-radius:14px;padding:12px 12px 12px 18px;box-shadow:inset 0 1px 0 rgba(255,236,200,.06),0 14px 30px -18px rgba(0,0,0,.8)}
+.join label{font-family:var(--display);font-size:20px;font-weight:600;white-space:nowrap}
+.join .codein{width:100%;min-width:0;font-size:24px;padding:9px 14px;background:#0c0a08;border-color:#2e2821}
+.join .btn{padding:13px 26px;font-size:18px}
+.join .note{grid-column:2/-1;font-size:13px;color:var(--muted);margin-top:-4px}
+.join .note.err{color:var(--bad)}
+
+/* games */
+.games{display:grid;grid-template-columns:1.15fr 1fr;grid-template-rows:auto auto;gap:20px}
+.game{position:relative;display:grid;gap:12px;align-content:start;padding:22px 22px 20px;border-radius:22px;overflow:hidden;
+  background:radial-gradient(130% 90% at 30% 0%,var(--felt-hi),var(--felt) 50%,var(--felt-lo));
+  border:7px solid var(--wood-lo);box-shadow:0 0 0 1px rgba(255,214,160,.08),0 22px 40px -18px rgba(20,8,0,.85);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.game{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s}
+.game:hover{transform:translateY(-3px);border-color:var(--wood);box-shadow:0 0 0 1px rgba(255,214,160,.14),0 30px 50px -18px rgba(20,8,0,.9)}
+.game.feat{grid-row:1/3;padding:28px 28px 26px;align-content:space-between}
+.game.side{grid-template-columns:auto minmax(0,1fr);column-gap:22px;align-items:center}
+.game.side .emblem{grid-row:1/5;align-self:center}
+.game h2{margin:0;font-family:var(--display);font-weight:800;font-size:clamp(28px,3vw,38px);letter-spacing:-.005em;line-height:1}
+.game .body{display:grid;gap:12px}
+.game.feat h2{font-size:clamp(40px,5vw,64px)}
+.game .meta{font-size:14px;color:#cfe3dc;font-weight:600}
+.game p{margin:0;font-size:15px;line-height:1.55;color:#e2ece8;max-width:46ch;text-wrap:pretty}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.actions .btn{text-decoration:none;text-align:center}
+.actions .alt{color:#e9f3ef;font-weight:700;font-size:15px;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(255,255,255,.35);padding:8px 4px;border-radius:6px}
+.actions .alt:hover{text-decoration-color:var(--accent)}
+
+/* emblems */
+.emblem{display:flex;align-items:center;gap:8px}
+.feat .emblem{min-height:clamp(150px,22vh,230px);justify-content:flex-start;gap:0}
+.feat .emblem .pc{--cw:clamp(78px,9vw,118px)}
+.feat .emblem .pc:nth-child(1){transform:rotate(-9deg) translateY(6px)}
+.feat .emblem .pc:nth-child(2){transform:rotate(4deg);margin-left:-18px}
+.feat .stack{display:flex;flex-direction:column-reverse;margin-left:clamp(18px,3vw,40px);align-self:flex-end}
+.feat .stack i{width:66px;height:14px;border-radius:50%;margin-top:-7px;border:3px dashed rgba(255,255,255,.7);background:#b07a1c;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.feat .stack i:nth-child(odd){background:#8d2f33}
+.tile{width:44px;height:60px;border-radius:6px;background:linear-gradient(var(--ivory),var(--ivory-lo));box-shadow:0 2px 0 var(--ivory-edge),0 6px 12px rgba(10,20,15,.45);display:flex;flex-direction:column;align-items:center;padding-top:8px;font-family:var(--display);font-weight:800;font-size:25px;line-height:1}
 .tile i{width:10px;height:10px;border-radius:50%;background:currentColor;margin-top:5px}
-.tile.r{color:var(--red)}.tile.y{color:var(--yel)}.tile.b{color:var(--blu)}
-.emblem .pc{--cw:48px}
-.emblem .pc:first-child{transform:rotate(-8deg)}.emblem .pc:last-child{transform:rotate(7deg)}
-.coin{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:26px;color:#fff;border:4px dashed rgba(255,255,255,.7)}
-.coin.p{background:var(--pblue)}.coin.b{background:var(--bred)}.coin.t{background:#2f9a4c;width:44px;height:44px;font-size:18px}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
-.actions .btn{flex:1;text-decoration:none;text-align:center;min-width:140px}
-.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.how div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:14px;line-height:1.5;color:var(--muted)}
-.how b{display:block;color:var(--text);font-family:var(--display);font-size:18px;margin-bottom:2px}
-.how .n{font-family:var(--display);color:var(--accent);font-weight:800;font-size:13px;letter-spacing:.1em}
-footer{font-size:12px;color:var(--muted);text-align:center}
-@media (max-width:860px){.games,.how{grid-template-columns:1fr}.join h2{flex-basis:100%}}
+.tile.r{color:var(--red)}.tile.y{color:var(--yel);transform:translateY(-6px)}.tile.b{color:var(--blu)}
+.coin{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:23px;color:#fff;border:4px dashed rgba(255,255,255,.7);box-shadow:0 6px 12px rgba(10,20,15,.45)}
+.coin.p{background:var(--pblue)}.coin.b{background:var(--bred);margin-left:-10px}
+
+/* how it works ribbon */
+.how{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 22px;padding:16px 4px 0;border-top:1px solid rgba(255,236,200,.08);color:var(--muted);font-size:15px;line-height:1.5}
+.how b{color:var(--text);font-weight:700}
+.how .n{font-family:var(--display);color:var(--accent);font-weight:700;margin-right:6px;font-variant-numeric:tabular-nums}
+footer{position:relative;z-index:2;font-size:12px;color:var(--muted);padding:0 18px 28px;text-align:left;max-width:1180px;margin:0 auto}
+
+/* entry: staggered rise, from a visible resting state */
+@media (prefers-reduced-motion:no-preference){
+  .rise{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+  .d1{animation-delay:.06s}.d2{animation-delay:.14s}.d3{animation-delay:.22s}.d4{animation-delay:.3s}.d5{animation-delay:.38s}
+  @keyframes rise{from{opacity:.001;transform:translateY(14px)}to{opacity:1;transform:none}}
+}
+@media (max-width:860px){
+  .mast{grid-template-columns:1fr}.mast p{margin:0}
+  .games{grid-template-columns:1fr}.game.feat{grid-row:auto}.feat .emblem{min-height:0}
+  .join{grid-template-columns:minmax(0,1fr) auto;padding:14px}.join label{grid-column:1/-1}.join .note{grid-column:1/-1;margin-top:0}
+}
+@media (max-width:420px){.game.side{grid-template-columns:1fr}.game.side .emblem{grid-row:auto}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="mast">
+<a class="skip" href="#games">Skip to the games</a>
+<main class="wrap">
+  <header class="mast rise">
     <div class="brand">BACK <span>ROOM</span></div>
-    <p>Game night on the big screen. The TV is the table, everyone's phone is their hand.</p>
-  </div>
+    <p>Game night on the big screen. <em>The TV is the table, everyone's phone is their hand.</em></p>
+  </header>
 
-  <section class="join" aria-labelledby="joinH">
-    <h2 id="joinH">Got a table code?</h2>
-    <form id="jf">
-      <input class="codein" id="code" maxlength="5" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="•••••" aria-label="Table code">
-      <button class="btn gold" type="submit">Join</button>
-      <div class="note">Type the 5 characters shown on the TV, or just scan the QR code there with your camera.</div>
-    </form>
-  </section>
+  <form class="join rise d1" id="jf" novalidate>
+    <label for="code">Got a table code?</label>
+    <input class="codein" id="code" maxlength="5" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="•••••" aria-describedby="jnote">
+    <button class="btn gold" type="submit">Join</button>
+    <div class="note" id="jnote" aria-live="polite">The 5 characters on the TV. Scanning the QR code there works too.</div>
+  </form>
 
-  <section class="games" aria-label="Games">
-    <article class="game">
-      <div class="emblem"><div class="tile r">7<i></i></div><div class="tile y">7<i></i></div><div class="tile b">7<i></i></div></div>
-      <h3>Okey</h3>
-      <div class="meta">2–4 PLAYERS · PHONES SIDEWAYS · BOTS FILL IN</div>
-      <p>Turkish rummy with tiles. Build runs and groups, throw your last tile to finish. Your rack lives on your phone.</p>
-      <div class="actions"><a class="btn gold" href="okey.html?tv">Host on TV</a><a class="btn dark" href="okey.html">Play solo</a></div>
+  <section class="games" id="games" aria-label="Games">
+    <article class="game feat rise d2">
+      <div class="emblem" aria-hidden="true">
+        <div class="pc s-s"><span class="r">A</span><span class="s">♠</span></div><div class="pc s-h"><span class="r">K</span><span class="s">♥</span></div>
+        <div class="stack"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="body">
+        <h2>Poker</h2>
+        <div class="meta">6-max no limit hold'em · up to 5 phones · bots in every empty seat</div>
+        <p>Phones take over bot seats from the next hand. Hold your phone to peek at your cards, act from there, and the TV deals, counts the pot and settles side pots.</p>
+        <div class="actions"><a class="btn gold" href="poker.html?tv">Host on TV</a></div>
+      </div>
     </article>
-    <article class="game">
-      <div class="emblem"><div class="pc s-s"><span class="r">A</span><span class="s">♠</span></div><div class="pc s-h"><span class="r">K</span><span class="s">♥</span></div></div>
-      <h3>Poker</h3>
-      <div class="meta">6-MAX NO LIMIT HOLD'EM · UP TO 5 PHONES</div>
-      <p>Bots hold every empty seat and phones take them over. Hold your phone to peek at your cards, act from there.</p>
-      <div class="actions"><a class="btn gold" href="poker.html?tv">Host on TV</a></div>
+    <article class="game side rise d3">
+      <div class="emblem" aria-hidden="true"><div class="tile r">7<i></i></div><div class="tile y">7<i></i></div><div class="tile b">7<i></i></div></div>
+      <h2>Okey</h2>
+      <div class="meta">2–4 players · phones sideways</div>
+      <p>Turkish rummy with tiles. Build runs and groups, throw your last tile to finish.</p>
+      <div class="actions"><a class="btn gold" href="okey.html?tv">Host on TV</a><a class="alt" href="okey.html">or play solo</a></div>
     </article>
-    <article class="game">
-      <div class="emblem"><div class="coin p">P</div><div class="coin t">T</div><div class="coin b">B</div></div>
-      <h3>Punto Banco</h3>
-      <div class="meta">8 DECKS · NO COMMISSION · ANY NUMBER</div>
-      <p>Baccarat without the commission: Player and Banker both pay 1:1, Tie 10:1. Bet from your phone.</p>
+    <article class="game side rise d4">
+      <div class="emblem" aria-hidden="true"><div class="coin p">P</div><div class="coin b">B</div></div>
+      <h2>Punto Banco</h2>
+      <div class="meta">8 decks · no commission · any number</div>
+      <p>Baccarat where Player and Banker both pay 1:1. Bet from your phone, watch the deal on the TV.</p>
       <div class="actions"><a class="btn gold" href="punto.html?tv">Host on TV</a></div>
     </article>
   </section>
 
-  <section class="how" aria-label="How it works">
-    <div><span class="n">STEP 1</span><b>Host on the TV</b>Open a game with “Host on TV” on the laptop connected to the TV. Press F for full screen.</div>
-    <div><span class="n">STEP 2</span><b>Phones join</b>Everyone scans the QR code on the TV, types a name and joins. No accounts, no apps.</div>
-    <div><span class="n">STEP 3</span><b>Play</b>Bots keep every empty seat busy. If a phone drops, it gets its seat back on rejoin.</div>
+  <section class="how rise d5" aria-label="How it works">
+    <span><span class="n">1</span><b>Host on the TV</b> from the laptop, press F for full screen.</span>
+    <span><span class="n">2</span><b>Phones scan the QR</b>, type a name, no accounts or apps.</span>
+    <span><span class="n">3</span><b>Play.</b> Dropped phones get their seat back when they rejoin.</span>
   </section>
-  <footer>Play money only. Moves travel over a free public relay, encrypted with the table code.</footer>
-</div>
+</main>
+<footer>Play money only. Moves travel over a free public relay, encrypted with the table code.</footer>
 <div class="toast" id="toast" hidden></div>
 <script src="table.js"></script>
 <script>
 (function(){
-  const q=new URLSearchParams(location.search).get('t');
-  const go=c=>{c=TABLE.normCode(c);const g=TABLE.codeGame(c);if(!g){TABLE.toast("That code doesn't look right. It's 5 characters, shown on the TV.");return;}location.href=TABLE.PAGES[g]+'?t='+c;};
-  if(q){go(q);}
-  document.getElementById('jf').addEventListener('submit',e=>{e.preventDefault();go(document.getElementById('code').value);});
+  const note=document.getElementById('jnote'),inp=document.getElementById('code');
+  const base=note.textContent;
+  const go=c=>{c=TABLE.normCode(c);const g=TABLE.codeGame(c);
+    if(!g){note.textContent=c.length<5?'Table codes are 5 characters, shown on the TV.':"That code doesn't match a table. Check it on the TV.";note.classList.add('err');inp.focus();return;}
+    location.href=TABLE.PAGES[g]+'?t='+c;};
+  const q=new URLSearchParams(location.search).get('t');if(q)go(q);
+  inp.addEventListener('input',()=>{note.textContent=base;note.classList.remove('err');});
+  document.getElementById('jf').addEventListener('submit',e=>{e.preventDefault();go(inp.value);});
 })();
 </script>
 </body>
