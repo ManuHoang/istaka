@@ -11,77 +11,118 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Saira+Semi+Condensed:wght@600;700;800&display=swap">
 <link rel="stylesheet" href="table.css">
 <style>
+/* Poker redesign. TV: oval card-room table, pill nameplates with initials, chip stacks, slide-and-flip dealing.
+   Phone: your hand is the hero, actions docked at the bottom. One brass accent; action colors are semantic. */
+@keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:none;opacity:1}}
+@keyframes drop{0%{transform:translateY(-5vh) scale(.6);opacity:0}100%{transform:none;opacity:1}}
+@keyframes dealIn{0%{transform:translate(-14vw,-8vh) rotate(-24deg) scale(.7);opacity:0}15%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes flipUp{0%{transform:rotateY(180deg)}100%{transform:rotateY(0)}}
+.dc{width:var(--cw);height:calc(var(--cw)*1.4);perspective:900px;flex:none}
+.dci{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+.dci>.pc{position:absolute;inset:0;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.dci>.pc.back{transform:rotateY(180deg)}
+.dc.deal{animation:dealIn 650ms cubic-bezier(.16,.84,.28,1) both;animation-delay:calc(var(--t)*-1ms)}
+.dc.deal .dci{animation:flipUp 520ms cubic-bezier(.3,.6,.25,1) both;animation-delay:calc(650ms - var(--t)*1ms)}
+.dc.flip .dci{animation:flipUp 600ms cubic-bezier(.3,.6,.25,1) both;animation-delay:calc(var(--t)*-1ms)}
+.drop{animation:drop 520ms cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--t)*-1ms)}
+.pop{animation:pop 450ms cubic-bezier(.2,1.6,.4,1) both;animation-delay:calc(var(--t)*-1ms)}
+
 /* ---------- TV table ---------- */
 .ptable{position:relative;height:100%;width:100%}
-.felt{position:absolute;inset:9% 6%;border-radius:999px;background:radial-gradient(ellipse at center,var(--felt-hi) 0%,var(--felt) 45%,var(--felt-lo) 100%);border:clamp(8px,1.6vh,16px) solid var(--wood-lo);box-shadow:inset 0 0 50px rgba(0,0,0,.55),0 12px 30px rgba(0,0,0,.6)}
+.felt{position:absolute;inset:12% 8%;border-radius:999px;
+  background:radial-gradient(ellipse 62% 58% at 50% 44%,#2f8b6f 0%,#1f6c55 46%,#134838 80%,#0d3328 100%);
+  --rail:clamp(10px,1.8vh,18px);
+  box-shadow:0 0 0 var(--rail) #4b2b14,0 0 0 calc(var(--rail) + 2px) #24140a,0 0 0 calc(var(--rail) + 3px) rgba(255,214,160,.12),inset 0 0 80px rgba(0,0,0,.55),0 34px 60px -22px rgba(0,0,0,.85)}
+.felt::before{content:"";position:absolute;inset:8%;border-radius:999px;border:2px solid rgba(255,255,255,.07)}
+.felt::after{content:"BACK ROOM";position:absolute;left:50%;top:76%;transform:translate(-50%,-50%);font-family:var(--display);font-weight:800;letter-spacing:.55em;font-size:clamp(11px,2vh,20px);color:rgba(255,255,255,.07);white-space:nowrap}
 .abs{position:absolute;transform:translate(-50%,-50%)}
 .seat{display:flex;flex-direction:column;align-items:center;z-index:2}
-.hole{display:flex;gap:4px;margin-bottom:-.8vh;min-height:1vh;position:relative;z-index:1;--cw:clamp(26px,5vh,52px)}
-.plate{position:relative;z-index:2;background:rgba(10,8,6,.92);border:1px solid var(--line);border-radius:12px;padding:.6vh 1vw .8vh;min-width:clamp(90px,11vw,170px);text-align:center}
-.seat.turn .plate{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),0 0 18px rgba(240,179,67,.5)}
-.seat.win .plate{border-color:var(--ok);box-shadow:0 0 0 2px var(--ok),0 0 18px rgba(75,191,107,.45)}
-.seat.folded{opacity:.45}
-.seat.away .plate{opacity:.6}
-.nm{font-weight:800;font-size:clamp(13px,2.1vh,22px);display:flex;gap:6px;justify-content:center;align-items:center;white-space:nowrap;max-width:16vw;overflow:hidden}
-.tag{font-size:clamp(8px,1.1vh,11px);text-transform:uppercase;letter-spacing:.6px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;font-weight:800}
-.tag.phn{color:var(--accent);border-color:var(--accent)}
-.st{font-family:var(--display);font-size:clamp(15px,2.6vh,28px);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-.pos{position:absolute;top:-.9vh;right:-.6vw;font-size:clamp(8px,1.1vh,11px);font-weight:800;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 4px}
-.lab{position:absolute;left:50%;bottom:-1.3vh;transform:translateX(-50%);white-space:nowrap;font-size:clamp(10px,1.5vh,15px);font-weight:800;padding:1px 9px;border-radius:999px;background:var(--panel2);border:1px solid var(--line)}
-.lab.res{background:var(--ok);color:#06210d;border-color:var(--ok)}
-.tbar{position:absolute;left:8px;right:8px;bottom:3px;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
-.tbar i{display:block;height:100%;width:100%;background:var(--accent)}
-.chip{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.55);border-radius:999px;padding:3px 10px 3px 4px;font-size:clamp(12px,1.9vh,19px);font-weight:800;white-space:nowrap;z-index:1;font-variant-numeric:tabular-nums}
-.chip::before{content:"";width:clamp(12px,2vh,20px);height:clamp(12px,2vh,20px);border-radius:50%;background:radial-gradient(circle,#fff 0 30%,var(--bad) 31% 100%);border:2px dashed #fff}
-.dealer{width:clamp(18px,3vh,30px);height:clamp(18px,3vh,30px);border-radius:50%;background:var(--ivory);color:#111;font-weight:900;font-size:clamp(10px,1.6vh,15px);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,.5);z-index:1}
-.center{left:50%;top:48%;display:flex;flex-direction:column;align-items:center;gap:1vh}
-.pot{font-family:var(--display);font-size:clamp(16px,2.8vh,30px);font-weight:700;background:rgba(0,0,0,.35);padding:2px 16px;border-radius:999px;min-height:1em}
-.pot:empty{visibility:hidden}
-.board{display:flex;gap:.8vw;--cw:clamp(36px,7vh,72px);min-height:calc(var(--cw)*1.4)}
-.banner{font-family:var(--display);font-size:clamp(14px,2.4vh,26px);font-weight:700;text-align:center;min-height:1.2em;text-shadow:0 2px 6px rgba(0,0,0,.6)}
-.s0{left:50%;top:88%}.s1{left:10%;top:70%}.s2{left:10%;top:27%}.s3{left:50%;top:9%}.s4{left:90%;top:27%}.s5{left:90%;top:70%}
-.b0{left:50%;top:69%}.b1{left:25%;top:63%}.b2{left:25%;top:36%}.b3{left:50%;top:27%}.b4{left:75%;top:36%}.b5{left:75%;top:63%}
-.d0{left:39%;top:77%}.d1{left:19%;top:80%}.d2{left:19%;top:17%}.d3{left:61%;top:17%}.d4{left:81%;top:17%}.d5{left:81%;top:80%}
+.hole{display:flex;margin-bottom:-1.4vh;position:relative;z-index:1;--cw:clamp(28px,5.4vh,58px);min-height:calc(var(--cw)*1.4)}
+.hole>span{display:block}
+.hole>span:first-child{transform:rotate(-6deg) translateX(3px)}.hole>span:last-child{transform:rotate(6deg) translateX(-3px)}
+.plate{position:relative;z-index:2;display:flex;align-items:center;gap:.7vw;background:linear-gradient(180deg,#221c16,#120f0c);border-radius:999px;padding:.5vh 1.3vw .5vh .5vh;min-width:clamp(124px,13.5vw,220px);box-shadow:0 0 0 1px rgba(255,236,200,.1),0 10px 20px -10px rgba(0,0,0,.85);transition:box-shadow .35s,opacity .35s}
+.av{width:clamp(30px,5.2vh,54px);height:clamp(30px,5.2vh,54px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:clamp(14px,2.4vh,25px);background:#3a322a;color:#efe6da;flex:none}
+.av.ph{background:var(--accent);color:var(--accent-ink)}
+.info{display:grid;min-width:0;text-align:left;line-height:1.12}
+.nm{font-weight:700;font-size:clamp(12px,1.9vh,19px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:11vw}
+.st{font-family:var(--display);font-weight:700;font-size:clamp(15px,2.5vh,27px);color:var(--accent);font-variant-numeric:tabular-nums}
+.st.ai{color:#ff8a8f}
+.sub{font-size:clamp(9px,1.2vh,12px);color:var(--muted);white-space:nowrap}
+.seat.turn .plate{box-shadow:0 0 0 2px var(--accent),0 0 26px rgba(240,179,67,.5)}
+.seat.win .plate{box-shadow:0 0 0 2px var(--ok),0 0 26px rgba(75,191,107,.55)}
+.seat.folded .plate{opacity:.42}.seat.folded .hole{opacity:0}
+.seat.away .av{opacity:.5}
+.posb{position:absolute;top:-.9vh;right:.6vw;font-size:clamp(8px,1.05vh,11px);font-weight:800;background:#0f0d0b;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--muted)}
+.tbar{position:absolute;left:16%;right:10%;bottom:-.7vh;height:clamp(3px,.55vh,6px);border-radius:3px;background:rgba(0,0,0,.65);overflow:hidden}
+.tbar i{display:block;height:100%;width:100%;background:var(--accent);transition:background-color .4s}
+.tbar i.low,.tbar2 i.low{background:var(--bad)}
+.act{margin-top:1vh;font-size:clamp(10px,1.5vh,15px);font-weight:800;padding:.25vh .9vw;border-radius:999px;background:#2a241e;color:var(--text);white-space:nowrap;letter-spacing:.02em}
+.act.fold{background:#2c2722;color:var(--muted)}.act.check{background:#24443a}.act.call{background:#1f5180}.act.bet,.act.raise{background:#a8741b}.act.allin{background:#a3262c}.act.res{background:#2f8a48}.act.blind{background:#2a241e;color:var(--muted)}
+.act.ph{visibility:hidden}
+.bet{display:flex;align-items:center;gap:.5vw;z-index:1;font-family:var(--display);font-weight:700;font-size:clamp(13px,2.1vh,21px);font-variant-numeric:tabular-nums;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.chips{display:flex;flex-direction:column-reverse;align-items:center}
+.chips i{display:block;width:clamp(16px,2.7vh,27px);height:clamp(6px,.95vh,9px);border-radius:50%;margin-top:calc(clamp(6px,.95vh,9px) * -.4);border:2px dashed rgba(255,255,255,.85);box-shadow:0 1px 0 rgba(0,0,0,.45)}
+.chips i:nth-child(4n+1){background:#b07a1c}.chips i:nth-child(4n+2){background:#8d2f33}.chips i:nth-child(4n+3){background:#1f5180}.chips i:nth-child(4n){background:#1d1b1a}
+.dealer{width:clamp(20px,3.2vh,32px);height:clamp(20px,3.2vh,32px);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e9e1cf);color:#1a1205;font-family:var(--display);font-weight:800;font-size:clamp(10px,1.7vh,16px);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 6px rgba(0,0,0,.55),inset 0 -2px 0 rgba(0,0,0,.12);z-index:1;transition:left .6s cubic-bezier(.2,.8,.2,1),top .6s cubic-bezier(.2,.8,.2,1)}
+.center{left:50%;top:47%;display:flex;flex-direction:column;align-items:center;gap:1.2vh}
+.potp{display:flex;align-items:center;gap:.6vw;background:rgba(5,20,15,.45);padding:.45vh 1.2vw .45vh .6vw;border-radius:999px;font-family:var(--display);font-weight:700;font-size:clamp(16px,2.8vh,30px);font-variant-numeric:tabular-nums;min-height:1.6em}
+.potp small{font-family:var(--body);font-size:.5em;font-weight:700;letter-spacing:.12em;color:#bfe0d3}
+.potp.empty{visibility:hidden}
+.board{display:flex;gap:.7vw;--cw:clamp(38px,7.6vh,80px);min-height:calc(var(--cw)*1.4)}
+.banner{font-family:var(--display);font-size:clamp(14px,2.4vh,26px);font-weight:600;text-align:center;min-height:1.3em;text-shadow:0 2px 6px rgba(0,0,0,.6);max-width:44vw}
+.banner.win{color:#ffd98a}
+.s0{left:50%;top:89%}.s1{left:11%;top:71%}.s2{left:11%;top:27%}.s3{left:50%;top:9%}.s4{left:89%;top:27%}.s5{left:89%;top:71%}
+.b0{left:50%;top:70%}.b1{left:26%;top:64%}.b2{left:26%;top:36%}.b3{left:50%;top:27%}.b4{left:74%;top:36%}.b5{left:74%;top:64%}
+.d0{left:40%;top:77%}.d1{left:21%;top:79%}.d2{left:21%;top:18%}.d3{left:60%;top:17%}.d4{left:79%;top:18%}.d5{left:79%;top:79%}
 
 /* ---------- phone controller (portrait) ---------- */
-body.ctl{overflow-x:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.pctl{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;gap:10px;padding:max(10px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));max-width:560px;margin:0 auto}
-.ph-top{display:flex;align-items:baseline;gap:10px}
-.ph-top .me{font-weight:800;font-size:18px}
+body.ctl{overflow-x:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;background:radial-gradient(120% 50% at 50% 0%,#1d2a25,var(--bg) 70%)}
+.pctl{height:100vh;height:100dvh;display:flex;flex-direction:column;gap:clamp(6px,1.1vh,10px);padding:max(10px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));max-width:560px;margin:0 auto;overflow:hidden}
+.ph-top{display:flex;align-items:center;gap:10px}
+.ph-top .av{width:38px;height:38px;font-size:18px}
+.ph-top .who{display:grid;line-height:1.1;min-width:0}
+.ph-top .me{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ph-top .stk{font-family:var(--display);font-size:26px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
-.ph-top .net{font-size:13px;font-weight:700}
+.ph-top .net{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.ph-top .pp{font-size:12px;font-weight:800;border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--muted)}
 .pos-n{color:var(--ok)}.neg-n{color:var(--bad)}
-.ph-felt{background:radial-gradient(ellipse at center,var(--felt-hi),var(--felt) 60%,var(--felt-lo));border:6px solid var(--wood-lo);border-radius:16px;padding:10px;display:grid;gap:8px;justify-items:center}
-.ph-felt .board{--cw:clamp(36px,11vw,54px);gap:5px}
-.ph-felt .pot{font-size:18px}
-.ph-status{text-align:center;font-weight:800;font-size:17px;min-height:1.3em}
-.others{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
-.others div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 6px;font-size:12px;display:grid;min-width:0}
-.others div b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.others div.turn{border-color:var(--accent)}
-.others div.fold{opacity:.45}
-.others .bt{color:var(--accent);font-weight:800}
-.holebox{display:flex;justify-content:center;gap:12px;--cw:clamp(84px,27vw,120px);padding:6px 0;position:relative;touch-action:none}
-.holebox .pc{transition:transform .12s}
-.peek{text-align:center;font-size:13px;color:var(--muted)}
-.hint{text-align:center;font-size:13px;color:var(--muted);min-height:1.2em}
+.ph-felt{position:relative;background:radial-gradient(ellipse 70% 80% at 50% 40%,#2f8b6f,#1f6c55 50%,#134838);border-radius:20px;padding:clamp(8px,1.4vh,14px) 10px;display:grid;gap:clamp(5px,.9vh,8px);justify-items:center;box-shadow:0 0 0 6px #4b2b14,0 0 0 8px #24140a,inset 0 0 40px rgba(0,0,0,.45)}
+.ph-felt .board{--cw:min(13vw,6.6vh,56px);gap:5px}
+.ph-felt .potp{font-size:17px;padding:2px 12px}
+.ph-status{display:flex;justify-content:center}
+.ph-status span{font-weight:800;font-size:clamp(14px,2.2vh,17px);padding:5px 14px;border-radius:999px;background:var(--panel2);color:var(--text);text-align:center}
+.ph-status span.turn{background:var(--accent);color:var(--accent-ink)}
+.ph-status span.win{background:#2f8a48;color:#fff}
+.holebox{position:relative;display:flex;justify-content:center;align-items:center;--cw:min(28vw,13.5vh,124px);flex:1;min-height:0;touch-action:none}
+.holebox>span{display:block;transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.holebox>span:first-child{transform:rotate(-7deg) translateX(10px)}.holebox>span:last-child{transform:rotate(7deg) translateX(-10px)}
+.pctl.open .holebox>span:first-child{transform:rotate(-4deg) translateX(-4px) translateY(-6px)}.pctl.open .holebox>span:last-child{transform:rotate(4deg) translateX(4px) translateY(-6px)}
+.holebox .face{display:none}.pctl.open .holebox .face{display:inline-flex}.pctl.open .holebox .back{display:none}.pctl.open .peekhint{display:none}
+.hint{display:none}.pctl.open .hint{display:block}
+.peekhint{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);font-size:12px;font-weight:700;color:#f6e7c8;background:rgba(15,13,11,.78);padding:4px 10px;border-radius:999px;pointer-events:none;white-space:nowrap}
+.hint{text-align:center;font-size:13px;color:var(--muted)}
 .hint b{color:var(--text)}
-.acts{display:grid;gap:8px;margin-top:auto}
-.acts .tbar2{height:4px;border-radius:2px;background:var(--line);overflow:hidden}.acts .tbar2 i{display:block;height:100%;background:var(--accent)}
+.dock{display:grid;gap:8px;background:linear-gradient(180deg,#1d1915,#16130f);border-radius:18px;padding:10px;box-shadow:inset 0 1px 0 rgba(255,236,200,.06)}
+.tbar2{height:5px;border-radius:3px;background:rgba(0,0,0,.5);overflow:hidden}.tbar2 i{display:block;height:100%;background:var(--accent);transition:background-color .4s}
 .presets{display:flex;gap:6px}.presets button{flex:1;padding:9px 4px}
 .sl{display:flex;gap:8px;align-items:center}
 .sl input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:30px}
-.sl .amt{font-family:var(--display);font-size:20px;font-weight:800;min-width:70px;text-align:right;font-variant-numeric:tabular-nums}
+.sl .amt{font-family:var(--display);font-size:20px;font-weight:800;min-width:64px;text-align:right;font-variant-numeric:tabular-nums}
 .abtns{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px}
-.abtns .btn{padding:16px 6px;font-size:18px}
+.abtns .btn{padding:clamp(12px,1.9vh,16px) 6px;font-size:18px}
+.btn.blue{box-shadow:0 8px 18px -10px rgba(31,81,128,.9)}.btn.red{box-shadow:0 8px 18px -10px rgba(122,42,47,.9)}
+.others{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.others>div{display:grid;justify-items:center;gap:1px;padding:5px 2px;border-radius:12px;background:var(--panel);font-size:11px;min-width:0;transition:opacity .3s,box-shadow .3s}
+.others .av{width:26px;height:26px;font-size:12px}
+.others b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.others .s{font-variant-numeric:tabular-nums;color:var(--muted)}
+.others .l{font-weight:800;color:var(--accent);min-height:1.2em;white-space:nowrap}
+.others>div.turn{box-shadow:0 0 0 2px var(--accent)}
+.others>div.fold{opacity:.4}
 .ph-tools{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-#myturn{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 4px var(--accent);opacity:0;transition:opacity .2s;z-index:50}
+#myturn{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 4px var(--accent);opacity:0;transition:opacity .3s;z-index:50}
 #myturn.on{opacity:1}
-body.ctl .pctl{gap:clamp(6px,1.1vh,10px)}
-body.ctl .holebox{--cw:min(27vw,12.5vh,120px);padding:2px 0}
-body.ctl .ph-felt{padding:clamp(6px,1vh,10px)}
-body.ctl .ph-felt .board{--cw:min(11vw,6.4vh,54px)}
-body.ctl .abtns .btn{padding:clamp(12px,1.9vh,16px) 6px}
+@media (max-height:640px){.others .av{display:none}.hint{display:none}}
 </style>
 </head>
 <body>
@@ -94,7 +135,7 @@ body.ctl .abtns .btn{padding:clamp(12px,1.9vh,16px) 6px}
 'use strict';
 const {$,esc,toast,randInt}=TABLE;
 const QS=new URLSearchParams(location.search);
-const SB=5,BB=10,START=1000,REMOTE_MS=30000,MAXP=5;
+const SB=5,BB=10,START=1000,REMOTE_MS=45000,MAXP=5;
 const RANKS='23456789TJQKA',SUITS='shdc',SYM={s:'♠',h:'♥',d:'♦',c:'♣'};
 const CAT=['High card','Pair','Two pair','Trips','Straight','Flush','Full house','Quads','Straight flush'];
 const POS=['BTN','SB','BB','UTG','HJ','CO'];
@@ -111,7 +152,7 @@ const PROFILES={
   shark2:{name:'Orla', tag:'shark',  loose:0.6, bluff:0.18,sticky:-0.03,limp:0,   skill:1},
 };
 const LINEUPS={
-  soft:['whale','station','maniac','nit','reg','station'],
+  soft:['whale','station','maniac','nit','reg','lag'],
   normal:['station','lag','nit','reg','tag','maniac'],
   tough:['lag','reg','tag','tag2','shark','shark2'],
 };
@@ -170,7 +211,7 @@ function equity(hole,board,nOpp,iters,tight){
 /* =====================================================================
    HOST (TV): runs the game, bots fill seats, phones take seats over
    ===================================================================== */
-const H={net:null,code:'',diff:'normal',paused:false,started:false,delay:850,
+const H={net:null,code:'',diff:'normal',paused:false,started:false,delay:1700,extra:0,
   P:[],btn:0,board:[],deck:[],street:'idle',cb:0,mr:BB,ta:-1,rc:0,sr:0,sbI:0,bbI:0,hn:0,n:0,
   gen:0,reveal:false,deadline:0,timer:null,autoT:null,log:[],ledger:{},pending:[],lastWinners:''};
 function hlog(t,hd){H.log.push(hd?'§'+t:t);if(H.log.length>200)H.log.splice(0,H.log.length-200);}
@@ -213,6 +254,7 @@ function startHand(){
   H.sbI=nx(H.btn);H.bbI=nx(H.sbI);
   post(H.sbI,SB);post(H.bbI,BB);H.P[H.sbI].last='SB';H.P[H.bbI].last='BB';
   H.cb=BB;H.mr=BB;H.ta=nx(H.bbI);
+  H.extra=H.delay>=500?2400:0;
   loop();
 }
 function shuffle(){const d=[...Array(52).keys()];for(let i=51;i>0;i--){const j=randInt(i+1);[d[i],d[j]]=[d[j],d[i]];}return d;}
@@ -223,10 +265,11 @@ function loop(){
   if(i>=0){
     const p=H.P[i],g=H.gen,n=H.n;
     if(p.ctrl==='remote'){
-      const ms=p.away?1200:REMOTE_MS;H.deadline=Date.now()+ms;
+      const ms=p.away?1200:REMOTE_MS+H.extra;H.extra=0;H.deadline=Date.now()+ms;
       H.timer=setTimeout(()=>{if(g===H.gen&&H.n===n&&H.ta===i){const tc=H.cb-p.bet;hlog(`${p.name} timed out`);act(i,tc>0?'fold':'check');}},ms);
     } else {
-      H.timer=setTimeout(()=>{if(g===H.gen&&H.n===n&&H.ta===i){const d=botDecide(i);act(i,d.type,d.to);}},H.delay);
+      const think=H.delay*(0.75+Math.random()*0.75)+H.extra;H.extra=0;
+      H.timer=setTimeout(()=>{if(g===H.gen&&H.n===n&&H.ta===i){const d=botDecide(i);act(i,d.type,d.to);}},think);
     }
   }
   publish();
@@ -265,10 +308,10 @@ function endStreet(){
   const able=H.P.filter(p=>!p.folded&&!p.allIn&&p.cards.length).length;
   if(able<=1){
     H.reveal=true;publish();
-    const g=H.gen;setTimeout(()=>{if(g!==H.gen)return;dealStreet();endStreet();},1300);
+    const g=H.gen;setTimeout(()=>{if(g!==H.gen)return;dealStreet();endStreet();},H.delay>=500?2600:300);
     return;
   }
-  dealStreet();
+  dealStreet();H.extra=H.delay>=500?1600:0;
   for(let k=1;k<=6;k++){const j=(H.btn+k)%6;if(needs(H.P[j])){H.ta=j;break;}}
   loop();
 }
@@ -320,7 +363,7 @@ function endHand(){
   H.ta=-1;H.street='done';H.deadline=0;clearTimeout(H.timer);H.n++;
   H.P.forEach(p=>{if(p.ctrl==='remote')H.ledger[p.gid]={stack:p.stack,buyins:p.buyins||1};});
   publish();
-  if(!H.paused){const g=H.gen;H.autoT=setTimeout(()=>{if(g===H.gen&&H.street==='done'&&!H.paused)startHand();},5500);}
+  if(!H.paused){const g=H.gen;H.autoT=setTimeout(()=>{if(g===H.gen&&H.street==='done'&&!H.paused)startHand();},H.delay>=500?8500:600);}
 }
 
 /* ---------- bots ---------- */
@@ -392,32 +435,48 @@ function publish(){
 setInterval(()=>{if(H.net&&H.net.guests.size)publish();},3000);
 
 /* ---------- TV rendering ---------- */
+let SEEN={},SEENH=null;
+function since(hn,key){if(SEENH!==hn){SEEN={};SEENH=hn;}const now=Date.now();if(SEEN[key]==null)SEEN[key]=now;return now-SEEN[key];}
+const initial=n=>esc((String(n||'?').trim()[0]||'?').toUpperCase());
+function actClass(l,isRes){if(isRes)return 'res';return {Fold:'fold',Check:'check',Call:'call',Bet:'bet',Raise:'raise','All-in':'allin',SB:'blind',BB:'blind'}[l]||'';}
+function chipStack(amt){const n=Math.max(1,Math.min(6,1+Math.floor(Math.log2(amt/BB+1))));return `<span class="chips">${'<i></i>'.repeat(n)}</span>`;}
+function faceCard(c,cls,t){return `<div class="dc ${cls}" style="--t:${t}"><div class="dci">${cardHTML(c)}<div class="pc back"></div></div></div>`;}
+function boardHTML(v){
+  // flop cards land one after another, turn and river on their own
+  return [0,1,2,3,4].map(k=>{
+    const c=v.bd[k];if(c==null)return cardHTML(-1);
+    const t=since(v.hn,'bd'+k)-(k<3?k*240:0);
+    return faceCard(c,t<1170?'deal':'',t);
+  }).join('');
+}
 function seatsHTML(v,opts){
   let h='<div class="felt"></div>';
-  const tl=v.dl?`<div class="tbar"><i data-dl="${Date.now()+v.dl}" data-tot="${REMOTE_MS}"></i></div>`:'';
   v.P.forEach((p,i)=>{
     let cards='';
-    if(p.c&&!p.f)cards=(p.sh?p.sh.map(c=>cardHTML(c)):[cardHTML(null),cardHTML(null)]).join('');
-    const label=p.r||p.l;
+    if(p.c&&!p.f){
+      if(p.sh)cards=p.sh.map((c,k)=>{const t=since(v.hn,'sh'+i+k)-k*120;return `<span>${faceCard(c,t<600?'flip':'',t)}</span>`;}).join('');
+      else cards=[0,1].map(k=>{const t=since(v.hn,'h'+i+k)-(((i-v.btn+5)%6)+k*6)*110;return `<span><div class="pc back${t<520?' drop':''}" style="--t:${t}"></div></span>`;}).join('');
+    }
+    const isRes=!!p.r,label=p.r||p.l;
+    const lt=label?since(v.hn,'l'+i+label):0;
+    const tl=v.ta===i&&v.dl?`<div class="tbar"><i data-dl="${Date.now()+v.dl}" data-tot="${v.dl}"></i></div>`:'';
     h+=`<div class="seat abs s${i}${v.ta===i?' turn':''}${p.f?' folded':''}${p.w?' win':''}${p.away?' away':''}">
       <div class="hole">${cards}</div>
-      <div class="plate"><div class="nm">${esc(p.n)}${p.h?'<span class="tag phn">phone</span>':`<span class="tag">${esc(p.t)}</span>`}</div>
-        <div class="st">${p.a&&p.s===0&&v.st!=='done'?'ALL-IN':fmt(p.s)}</div>
-        ${v.st!=='idle'?`<div class="pos">${POS[(i-v.btn+6)%6]}</div>`:''}
-        ${v.ta===i?tl:''}
-        ${label?`<div class="lab${p.r?' res':''}">${esc(label)}</div>`:''}</div></div>`;
-    if(p.b>0)h+=`<div class="chip abs b${i}">${fmt(p.b)}</div>`;
+      <div class="plate"><div class="av${p.h?' ph':''}">${initial(p.n)}</div>
+        <div class="info"><span class="nm">${esc(p.n)}</span><span class="st${p.a&&p.s===0&&v.st!=='done'?' ai':''}">${p.a&&p.s===0&&v.st!=='done'?'All-in':fmt(p.s)}</span><span class="sub">${p.h?'phone':esc(p.t)}${p.away?' · away':''}</span></div>
+        ${v.st!=='idle'?`<div class="posb">${POS[(i-v.btn+6)%6]}</div>`:''}${tl}</div>
+      <div class="act ${label?actClass(label,isRes)+(lt<450?' pop':''):'ph'}" style="--t:${lt}">${esc(label||'·')}</div></div>`;
+    if(p.b>0){const bt=since(v.hn,'b'+i+':'+p.b);h+=`<div class="bet abs b${i}"><span class="${bt<450?'pop':''}" style="--t:${bt};display:flex;align-items:center;gap:.5vw">${chipStack(p.b)}${fmt(p.b)}</span></div>`;}
   });
   if(v.st!=='idle')h+=`<div class="dealer abs d${v.btn}">D</div>`;
-  const bd=[0,1,2,3,4].map(k=>v.bd[k]!=null?cardHTML(v.bd[k]):cardHTML(-1)).join('');
-  let banner='';
+  let banner='',win=false;
   if(v.st==='idle')banner=opts&&opts.idle||'';
-  else if(v.st==='done')banner=v.win||'';
-  else if(v.ta>=0)banner=`${esc(v.P[v.ta].n)} to act`;
-  h+=`<div class="center abs"><div class="pot">${v.pot?'Pot '+fmt(v.pot):''}</div><div class="board">${bd}</div><div class="banner">${esc(banner)}</div></div>`;
+  else if(v.st==='done'){banner=v.win||'';win=true;}
+  else if(v.ta>=0)banner=`${v.P[v.ta].n} to act`;
+  h+=`<div class="center abs"><div class="potp${v.pot?'':' empty'}">${chipStack(v.pot||BB)}<small>POT</small>${fmt(v.pot)}</div><div class="board">${boardHTML(v)}</div><div class="banner${win?' win':''}">${esc(banner)}</div></div>`;
   return h;
 }
-setInterval(()=>{document.querySelectorAll('.tbar i,.tbar2 i').forEach(el=>{const dl=+el.dataset.dl,tot=+el.dataset.tot||REMOTE_MS;el.style.width=Math.max(0,Math.min(100,(dl-Date.now())/tot*100))+'%';});},250);
+setInterval(()=>{document.querySelectorAll('.tbar i,.tbar2 i').forEach(el=>{const dl=+el.dataset.dl,tot=+el.dataset.tot||REMOTE_MS;const f=Math.max(0,Math.min(1,(dl-Date.now())/tot));el.style.width=f*100+'%';el.classList.toggle('low',f<.25);});},250);
 let LOGKEY='';
 function renderTV(){
   if(!document.body.classList.contains('tv'))return;
@@ -509,60 +568,60 @@ function presets(){
 }
 function renderPhone(){
   const v=C.v,app=$('#app');
-  if(!v){app.innerHTML=`<div class="pctl"><div class="ph-status">Waiting for the table…</div></div>`;return;}
+  if(!v){app.innerHTML=`<div class="pctl"><div class="ph-status"><span>Waiting for the table…</span></div></div>`;return;}
   const me=C.seat>=0?v.P[C.seat]:null;
   const turn=myTurnP();
   if(turn&&!C.wasTurn){TABLE.ping();C.raise=0;C.sizing=false;}
   C.wasTurn=turn;
   $('#myturn').classList.toggle('on',turn);
-  let status;
-  if(!me)status=C.pend?'You sit down when the next hand starts.':'Waiting for a seat…';
+  let status,stc='';
+  if(!me)status=C.pend?'You sit down when the next hand starts':'Waiting for a seat…';
   else if(v.st==='idle')status=v.started?'Next hand coming up…':'Waiting for the host to start…';
-  else if(v.st==='done')status=v.win||'Hand over';
-  else if(v.ta===-2)status='…';
-  else if(turn)status='Your turn';
+  else if(v.st==='done'){status=v.win||'Hand over';stc=me.w?'win':'';}
+  else if(v.ta===-2)status='Sent…';
+  else if(turn){status=v.cb-me.b>0?`Your turn · ${fmt(Math.min(v.cb-me.b,me.s))} to call`:'Your turn';stc='turn';}
   else if(me.f)status='You folded';
   else if(v.ta>=0)status=`${v.P[v.ta].n} to act`;
   else status='Dealing…';
-  const bd=[0,1,2,3,4].map(k=>v.bd[k]!=null?cardHTML(v.bd[k]):cardHTML(-1)).join('');
-  const others=v.P.map((p,i)=>i===C.seat?'':`<div class="${v.ta===i?'turn':''}${p.f?' fold':''}"><b>${esc(p.n)}</b><span>${fmt(p.s)}${p.b?` · <span class="bt">${fmt(p.b)}</span>`:''}</span><span class="muted">${esc(p.r||p.l||(p.f?'folded':''))}</span></div>`).join('');
-  const showCards=C.hole&&(C.peek||C.show||v.st==='done'&&me&&me.sh);
-  const hole=C.hole&&C.hole.length?C.hole.map(c=>cardHTML(showCards?c:null)).join(''):cardHTML(-1)+cardHTML(-1);
+  const open=!!(C.hole&&(C.peek||C.show||(v.st==='done'&&me&&me.sh)));
+  let hole;
+  if(C.hole&&C.hole.length)hole=C.hole.map((c,k)=>{const t=since(v.hn,'mh'+k)-k*140;return `<span><div class="pc back${t<520?' drop':''}" style="--t:${t}"></div>${cardHTML(c,'face')}</span>`;}).join('')+'<div class="peekhint">Hold to peek</div>';
+  else hole=`<span>${cardHTML(-1)}</span><span>${cardHTML(-1)}</span>`;
   let hint='';
-  if(C.hint&&C.hole&&C.hole.length&&(C.peek||C.show)&&!me.f){
+  if(C.hint&&C.hole&&C.hole.length&&me&&!me.f){
     const opps=v.P.filter((p,i)=>i!==C.seat&&!p.f&&p.c).length;
     const eq=equity(C.hole,v.bd,opps,600,0);
     hint=`${v.bd.length>=3?handName(evalHand(C.hole.concat(v.bd)))+' · ':''}equity vs ${opps} random: <b>${Math.round(eq*100)}%</b>`;
     if(turn&&v.cb-me.b>0)hint+=` · need <b>${Math.round((v.cb-me.b)/(v.pot+v.cb-me.b)*100)}%</b>`;
   }
-  let acts='';
+  let dock='';
   if(turn&&me){
     const toCall=Math.min(v.cb-me.b,me.s),maxTo=me.b+me.s;
     const canRaise=maxTo>v.cb&&v.P.some((p,i)=>i!==C.seat&&!p.f&&!p.a&&p.c);
     const minTo=Math.min(v.cb+v.mr,maxTo);
     if(!C.raise)C.raise=minTo;
     C.raise=Math.max(minTo,Math.min(maxTo,C.raise));
-    const tl=v.dl?`<div class="tbar2"><i data-dl="${Date.now()+v.dl}" data-tot="${REMOTE_MS}"></i></div>`:'';
-    acts=`<div class="acts">${tl}
+    const tl=v.dl?`<div class="tbar2"><i data-dl="${Date.now()+v.dl}" data-tot="${v.dl}"></i></div>`:'';
+    dock=`<div class="dock">${tl}
       ${canRaise&&C.sizing?`<div class="presets">${presets().map(([l,x])=>`<button class="small" data-p="${Math.max(minTo,Math.min(maxTo,x))}">${l}</button>`).join('')}</div>
-      <div class="sl"><button class="small" data-step="-1">−</button><input type="range" id="rs" min="${minTo}" max="${maxTo}" step="${BB/2}" value="${C.raise}"><button class="small" data-step="1">+</button><span class="amt" id="ramt">${fmt(C.raise)}</span></div>`:''}
+      <div class="sl"><button class="small" data-step="-1" aria-label="Smaller">−</button><input type="range" id="rs" min="${minTo}" max="${maxTo}" step="${BB/2}" value="${C.raise}" aria-label="Bet size"><button class="small" data-step="1" aria-label="Bigger">+</button><span class="amt" id="ramt">${fmt(C.raise)}</span></div>`:''}
       <div class="abtns">
         <button class="btn red" data-a="fold" ${toCall<=0?'disabled':''}>Fold</button>
         <button class="btn blue" data-a="${toCall>0?'call':'check'}">${toCall>0?(toCall>=me.s?'All-in ':'Call ')+fmt(toCall):'Check'}</button>
         <button class="btn gold" data-a="raise" ${canRaise?'':'disabled'}>${!C.sizing?(v.cb===0?'Bet…':'Raise…'):(C.raise>=maxTo?'All-in ':v.cb===0?'Bet ':'Raise to ')+fmt(C.raise)}</button>
       </div></div>`;
   }
+  const others=v.P.map((p,i)=>i===C.seat?'':`<div class="${v.ta===i?'turn':''}${p.f?' fold':''}"><span class="av${p.h?' ph':''}">${initial(p.n)}</span><b>${esc(p.n)}</b><span class="s">${fmt(p.s)}</span><span class="l">${p.b?fmt(p.b):esc(p.r?'won':p.l||'')}</span></div>`).join('');
   const net=me&&me.net!=null?me.net:null;
-  app.innerHTML=`<div class="pctl">
-    <div class="ph-top"><span class="me">${esc(C.name)}</span>${me?`<span class="stk">${fmt(me.s)}</span>${net!=null?`<span class="net ${net>=0?'pos-n':'neg-n'}">${net>=0?'+':''}${fmt(net)}</span>`:''}`:''}<span class="sp"></span>${me&&v.st!=='idle'?`<span class="muted">${POS[(C.seat-v.btn+6)%6]}</span>`:''}</div>
-    <div class="ph-felt"><div class="board">${bd}</div><div class="pot">${v.pot?'Pot '+fmt(v.pot):''}</div></div>
-    <div class="ph-status">${esc(status)}</div>
+  app.innerHTML=`<div class="pctl${open?' open':''}">
+    <div class="ph-top"><span class="av ph">${initial(C.name)}</span><div class="who"><span class="me">${esc(C.name)}</span>${me?`<span class="stk">${fmt(me.s)}</span>`:''}</div>${net!=null?`<span class="net ${net>=0?'pos-n':'neg-n'}">${net>=0?'+':''}${fmt(net)}</span>`:''}<span class="sp"></span>${me&&v.st!=='idle'?`<span class="pp">${POS[(C.seat-v.btn+6)%6]}</span>`:''}</div>
+    <div class="ph-felt"><div class="potp${v.pot?'':' empty'}"><small>POT</small>${fmt(v.pot)}</div><div class="board">${boardHTML(v)}</div></div>
+    <div class="ph-status"><span class="${stc}">${esc(status)}</span></div>
     <div class="holebox" id="hole">${hole}</div>
-    <div class="peek">${C.show?'Cards shown':'Press and hold your cards to peek'}</div>
-    <div class="hint">${hint}</div>
-    ${acts}
+    ${hint?`<div class="hint">${hint}</div>`:''}
+    ${dock}
     <div class="others">${others}</div>
-    <div class="ph-tools"><button class="small${C.show?' on':''}" data-t="show">${C.show?'Hide cards':'Always show cards'}</button><button class="small${C.hint?' on':''}" data-t="hint">Hints: ${C.hint?'on':'off'}</button><button class="small" data-t="leave">Leave</button></div>
+    <div class="ph-tools"><button class="small${C.show?' on':''}" data-t="show">${C.show?'Hide cards':'Always show'}</button><button class="small${C.hint?' on':''}" data-t="hint">Hints: ${C.hint?'on':'off'}</button><button class="small" data-t="leave">Leave</button></div>
   </div>`;
 }
 function sendAct(t,to){
@@ -583,7 +642,7 @@ document.addEventListener('click',e=>{
   if(t){if(t.dataset.t==='show')C.show=!C.show;else if(t.dataset.t==='hint')C.hint=!C.hint;else if(t.dataset.t==='leave'){C.sess&&C.sess.leave();location.href='./';return;}renderPhone();}
 });
 document.addEventListener('input',e=>{if(e.target.id==='rs'){C.raise=+e.target.value;const a=$('#ramt');if(a)a.textContent=fmt(C.raise);const b=document.querySelector('[data-a="raise"]');if(b&&C.v){const me=C.v.P[C.seat];b.textContent=(C.raise>=me.b+me.s?'All-in ':C.v.cb===0?'Bet ':'Raise to ')+fmt(C.raise);}}});
-function peek(on){if(C.peek===on)return;C.peek=on;if(!C.hole)return;const box=$('#hole');if(box&&!C.show)box.innerHTML=C.hole.map(c=>cardHTML(on?c:null)).join('');if(C.hint)renderPhone();}
+function peek(on){if(C.peek===on)return;C.peek=on;const el=document.querySelector('.pctl');const v=C.v,me=v&&C.seat>=0?v.P[C.seat]:null;if(el)el.classList.toggle('open',!!(C.hole&&(on||C.show||(v&&v.st==='done'&&me&&me.sh))));}
 document.addEventListener('pointerdown',e=>{if(e.target.closest('#hole')){e.preventDefault();peek(true);}});
 ['pointerup','pointercancel'].forEach(ev=>document.addEventListener(ev,()=>peek(false)));
 document.addEventListener('contextmenu',e=>{if(e.target.closest('#hole'))e.preventDefault();});
