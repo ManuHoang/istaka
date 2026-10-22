@@ -42,7 +42,7 @@
 .stats{font-size:clamp(11px,1.5vh,15px);display:flex;gap:1vw;white-space:nowrap}
 .stats b{font-family:var(--display);font-size:1.2em}
 
-/* ---------- phone ---------- */
+/* ---------- phone (fits one screen: Player/Banker take whatever height is left) ---------- */
 body.ctl{-webkit-user-select:none;user-select:none}
 .pctl{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;gap:12px;padding:max(10px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));max-width:560px;margin:0 auto}
 .top{display:flex;align-items:baseline;gap:10px}
@@ -77,6 +77,17 @@ body.ctl{-webkit-user-select:none;user-select:none}
 .foot2{font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
 #myturn{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 4px var(--accent);opacity:0;transition:opacity .2s;z-index:50}
 #myturn.on{opacity:1}
+body.ctl .pctl{height:100vh;height:100dvh;min-height:0;overflow:hidden;gap:clamp(6px,1.2vh,12px)}
+body.ctl .stat{font-size:clamp(17px,2.8vh,22px)}
+body.ctl .sub{font-size:13px}
+body.ctl .chipb{width:clamp(42px,6.5vh,56px);height:clamp(42px,6.5vh,56px);font-size:clamp(13px,2vh,17px)}
+body.ctl .zones{flex:1;min-height:0;grid-template-rows:minmax(0,1fr) auto auto}
+body.ctl .zone.P,body.ctl .zone.B{min-height:0}
+body.ctl .zone.T{padding:clamp(6px,1vh,10px) 8px}
+body.ctl .zone.small2{padding:clamp(5px,.9vh,8px)}
+body.ctl .btns .btn{padding:clamp(10px,1.7vh,14px) 6px}
+body.ctl .mini .cards{--cw:clamp(26px,4vh,34px);min-height:0}
+@media (max-height:720px){body.ctl .foot2,body.ctl .sub{display:none}}
 </style>
 </head>
 <body>

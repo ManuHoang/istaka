@@ -76,6 +76,11 @@ body.ctl{overflow-x:hidden;-webkit-user-select:none;user-select:none;-webkit-tou
 .ph-tools{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 #myturn{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 4px var(--accent);opacity:0;transition:opacity .2s;z-index:50}
 #myturn.on{opacity:1}
+body.ctl .pctl{gap:clamp(6px,1.1vh,10px)}
+body.ctl .holebox{--cw:min(27vw,12.5vh,120px);padding:2px 0}
+body.ctl .ph-felt{padding:clamp(6px,1vh,10px)}
+body.ctl .ph-felt .board{--cw:min(11vw,6.4vh,54px)}
+body.ctl .abtns .btn{padding:clamp(12px,1.9vh,16px) 6px}
 </style>
 </head>
 <body>
